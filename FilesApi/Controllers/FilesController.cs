@@ -41,7 +41,7 @@ public class FilesController : ControllerBase
     }
 
     // OPTION 2 - handles multiple files
-    [HttpPost("upload")]
+    [HttpPost("upload2")]
     public async Task<IActionResult> UploadFile()
     {
         var files = Request.Form.Files;

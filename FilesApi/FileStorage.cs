@@ -7,7 +7,14 @@ public interface IFileStorage
 // Implement the file storage interface to save files on the local disk
 public class LocalFileStorage : IFileStorage
 {
-    private string _storagePath = "MyPath";
+    private string _storagePath = "media";
+
+    public LocalFileStorage() {}
+    
+    public LocalFileStorage(string storagePath)
+    {
+        _storagePath = storagePath;
+    }
 
     public async Task<bool> SaveFileAsync(IFormFile file)
     {

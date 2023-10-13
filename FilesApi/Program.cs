@@ -9,6 +9,7 @@ builder.Services.AddSwaggerGen();
 
 // Watch for changes to files in our media directory.
 builder.Services.AddSingleton<IFileWatcher, FileWatcher>();
+builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
 
 var app = builder.Build();
 
@@ -26,7 +27,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // do i need this ?
-FileWatcher watcher = new();
-watcher.Start();
+// FileWatcher watcher = new();
+// watcher.Start();
 
-app.Run();
+app.Run(); // will call FileWatcher.Start() ?
