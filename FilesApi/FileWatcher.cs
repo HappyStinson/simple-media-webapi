@@ -1,23 +1,49 @@
-public interface IFileWatcher
-{
-    void Start();
-}
+namespace FilesApi;
 
-public class FileWatcher : IFileWatcher
+public class FileWatcher : IDisposable
 {
-    public void Start()
+    private readonly FileSystemWatcher _watcher;
+    private bool _disposed = false;
+
+    public FileWatcher(string path)
     {
-        FileSystemWatcher watcher = new("media");
-        watcher.EnableRaisingEvents = true;
-        
-        watcher.Changed += (sender, e) =>
+        Console.WriteLine($"Watching for changes in {path} directory.");
+
+        _watcher = new FileSystemWatcher(path)
         {
-            Console.WriteLine($"File {e.Name} was updated.");
+            EnableRaisingEvents = true
         };
 
-        watcher.Created += (sender, e) =>
+        _watcher.Created += OnFileCreated;
+        _watcher.Changed += OnFileChanged;
+    }
+
+    private void OnFileCreated(object sender, FileSystemEventArgs e)
+    {
+        Console.WriteLine($"File \"{e.Name}\" has been uploaded.");
+    }
+
+    private void OnFileChanged(object sender, FileSystemEventArgs e)
+    {
+        Console.WriteLine($"File \"{e.Name}\" was updated.");
+    }
+    
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    public void Dispose(bool disposing)
+    {
+        if (!_disposed)
         {
-            Console.WriteLine($"File {e.Name} has been uploaded.");
-        };
+            if (disposing)
+            {
+                _watcher.Dispose();
+            }
+
+            _disposed = true;
+        }
     }
 }

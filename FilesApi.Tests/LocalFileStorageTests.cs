@@ -1,23 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Moq;
+using FilesApi;
 
 public class LocalFileStorageTests
 {
-    [Fact]
-    public async Task SaveFileAsync_WhenFileTooLarge_ReturnsFalse()
-    {
-        // Arrange
-        var storage = new LocalFileStorage("media-test");
-        var file = new Mock<IFormFile>();
-        file.Setup(f => f.Length).Returns(600 * 1048576); // Simulate a file larger than 500MB.
-
-        // Act
-        var result = await storage.SaveFileAsync(file.Object);
-
-        // Assert
-        Assert.False(result);
-    }
-
     [Fact]
     public async Task SaveFileAsync_WhenFileExistsAndNotUpdated_ReturnsFalse()
     {

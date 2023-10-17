@@ -7,51 +7,35 @@ namespace FilesApi.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly IFileStorage _fileStorage;
+    private readonly FileWatcher _fileWatcher;
+    private const int _maxFileSize = 500 * 1048576;
+
 
     public FilesController(IFileStorage fileStorage)
     {
+        // get the directory to watch
         _fileStorage = fileStorage;
+        _fileWatcher = new(Path.Combine(Directory.GetCurrentDirectory(), "media"));
     }
 
     [HttpPost("upload")]
-    // [RequestSizeLimit(524288000)] // 500MB limit
-    // public async Task<IActionResult> UploadFiles(List<IFormFile> files)
-    public async Task<IActionResult> UploadFile([FromForm] IFormFile file) // improve to handle multiple files
+    public async Task<IActionResult> UploadFile([FromForm] List<IFormFile> files)
     {
-        try
+        if (files.Count < 1)
         {
-            var result = await _fileStorage.SaveFileAsync(file);
-            if (result)
-            {
-                return Ok("File uploaded successfully");
-            }
-            else
-            {
-                return Ok("File not updated");
-            }
+            return BadRequest($"No files were provided.");
         }
-        // catch (FileSizeLimitExceededException ex)
-        // {
-        //     return BadRequest(ex.Message);
-        // }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
-
-    // OPTION 2 - handles multiple files
-    [HttpPost("upload2")]
-    public async Task<IActionResult> UploadFile()
-    {
-        var files = Request.Form.Files;
 
         foreach (var file in files)
         {
-            var success = await _fileStorage.SaveFileAsync(file);
-            if (!success)
+            if (file.Length > _maxFileSize)
             {
-                return BadRequest("File size exceeds 500MB limit.");
+                return BadRequest($"{file.FileName} exceeds 500MB limit.");
+            }
+
+            if (!await _fileStorage.SaveFileAsync(file))
+            {
+                return StatusCode(500, $"Failed to save {file.FileName}.");
             }
         }
 

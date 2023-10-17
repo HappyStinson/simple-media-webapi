@@ -1,3 +1,5 @@
+using FilesApi;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,9 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Watch for changes to files in our media directory.
-builder.Services.AddSingleton<IFileWatcher, FileWatcher>();
-builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
+builder.Services.AddSingleton<IFileStorage, LocalFileStorage>();
 
 var app = builder.Build();
 
@@ -26,8 +26,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// do i need this ?
-// FileWatcher watcher = new();
-// watcher.Start();
-
-app.Run(); // will call FileWatcher.Start() ?
+app.Run();
