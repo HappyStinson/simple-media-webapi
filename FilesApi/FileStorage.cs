@@ -4,6 +4,8 @@ public interface IFileStorage
 {
     Task<bool> SaveFileAsync(IFormFile file);
     List<FileMetadata> GetFileList();
+    string GetStorageDirectoryPath();
+    void EnsureStorageDirectoryExists();
 }
 
 // Implement the file storage interface to save files on the local disk
@@ -11,11 +13,23 @@ public class LocalFileStorage : IFileStorage
 {
     private string _storagePath = "media";
 
-    public LocalFileStorage() {}
-    
+    public LocalFileStorage() => EnsureStorageDirectoryExists();
+
     public LocalFileStorage(string storagePath)
     {
         _storagePath = storagePath;
+        EnsureStorageDirectoryExists();
+    }
+
+    public void EnsureStorageDirectoryExists()
+    {
+        var storageDirectory = GetStorageDirectoryPath();
+
+        if (!Directory.Exists(storageDirectory))
+        {
+            Directory.CreateDirectory(storageDirectory);
+            Console.WriteLine($"Creating the media directory at: {storageDirectory}");
+        }
     }
 
     public async Task<bool> SaveFileAsync(IFormFile file)
@@ -56,8 +70,13 @@ public class LocalFileStorage : IFileStorage
                 Date = fileInfo.LastWriteTime
             });
         }
-
+     
         return fileMetadataList;
+    }
+
+    public string GetStorageDirectoryPath()
+    {
+        return Path.Combine(Directory.GetCurrentDirectory(), _storagePath);
     }
 }
 

@@ -10,7 +10,6 @@ public class FilesController : ControllerBase
     private readonly FileWatcher _fileWatcher;
     private const int _maxFileSize = 500 * 1048576;
 
-
     public FilesController(IFileStorage fileStorage)
     {
         // get the directory to watch
@@ -25,6 +24,9 @@ public class FilesController : ControllerBase
         {
             return BadRequest($"No files were provided.");
         }
+
+        // Create Media Directory if missing.
+        _fileStorage.EnsureStorageDirectoryExists();
 
         foreach (var file in files)
         {
@@ -45,6 +47,11 @@ public class FilesController : ControllerBase
     [HttpGet("list")]
     public IActionResult GetFileList()
     {
+        if (EmptyOrMissingDirectory())
+        {
+            return NotFound();
+        }
+
         try
         {
             var fileList = _fileStorage.GetFileList();
@@ -55,6 +62,22 @@ public class FilesController : ControllerBase
         {
             // Handle any exceptions that occur during file listing
             return StatusCode(500, $"An error occurred while retrieving the file list: {ex.Message}");
+        }
+    }
+
+    private bool EmptyOrMissingDirectory()
+    {
+        try
+        {
+            // Get a list of all entries (files and subdirectories) within the specified directory.
+            string[] entries = Directory.GetFileSystemEntries(_fileStorage.GetStorageDirectoryPath());
+
+            return entries.Length == 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error: " + ex.Message);
+            return false;
         }
     }
 }

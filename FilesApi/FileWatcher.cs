@@ -7,7 +7,7 @@ public class FileWatcher : IDisposable
 
     public FileWatcher(string path)
     {
-        Console.WriteLine($"Watching for changes in {path} directory.");
+        // Console.WriteLine($"Watching for changes in {path} directory.");
 
         _watcher = new FileSystemWatcher(path)
         {

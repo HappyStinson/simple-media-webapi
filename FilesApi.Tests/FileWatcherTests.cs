@@ -19,11 +19,11 @@ public class FileWatcherTests
             // Act
             File.Create(Path.Combine(tempDirectory, filename)).Close();
             // Sleep to give the file watcher some time to detect the change
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
 
             // Assert
             var output = consoleOutput.ToString();
-            Assert.Contains($"File {filename} has been uploaded.", output);
+            Assert.Contains($"File \"{filename}\" has been uploaded.", output);
         }
 
         // Clean up
@@ -55,7 +55,7 @@ public class FileWatcherTests
 
             // Assert
             var output = consoleOutput.ToString();
-            Assert.Contains($"File {filename} was updated.", output);
+            Assert.Contains($"File \"{filename}\" was updated.", output);
         }
 
         // Clean up
